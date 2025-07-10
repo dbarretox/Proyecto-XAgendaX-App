@@ -1,36 +1,150 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# XAgendaX 📅
 
-## Getting Started
+Sistema de gestión de citas y agendas para salones de belleza, spas y negocios de servicios. Desarrollado con Next.js, TypeScript y Supabase.
 
-First, run the development server:
+## 🚀 Estado del Proyecto
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### ✅ Completado
+- Configuración inicial de Next.js con TypeScript y Tailwind CSS
+- Integración con Supabase (autenticación y base de datos)
+- Sistema de autenticación funcional
+- Layout compartido con sidebar responsive y header
+- Dashboard con métricas visuales
+- Navegación dinámica con resaltado de página activa
+- Protección de rutas centralizada
+
+### 🔄 En Progreso
+- Configuración de tablas en Supabase (clientes, citas, servicios)
+- Página de Clientes con CRUD básico
+- Conexión del dashboard con datos reales
+
+## 🛠️ Stack Tecnológico
+
+- **Frontend**: Next.js 14 + React + TypeScript
+- **Estilos**: Tailwind CSS
+- **Base de datos**: Supabase (PostgreSQL)
+- **Autenticación**: Supabase Auth
+- **Hosting**: Vercel (preparado)
+- **Iconos**: Lucide React
+
+## 📁 Estructura del Proyecto
+
+```
+xagendax/
+├── src/
+│   ├── app/
+│   │   ├── (dashboard)/          # Grupo de rutas autenticadas
+│   │   │   ├── layout.tsx        # Layout con sidebar y header
+│   │   │   └── dashboard/
+│   │   │       └── page.tsx      # Página principal del dashboard
+│   │   ├── login/
+│   │   │   └── page.tsx          # Página de login
+│   │   ├── page.tsx              # Redirección a /dashboard
+│   │   ├── layout.tsx            # Layout raíz
+│   │   └── globals.css           # Estilos globales
+│   └── lib/
+│       └── supabase.ts           # Cliente de Supabase
+├── .env.local                    # Variables de entorno (no commitear)
+└── [archivos de configuración]
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Instalación y Configuración
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Prerrequisitos
+- Node.js 18+ 
+- npm o yarn
+- Cuenta en Supabase
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Pasos de Instalación
 
-## Learn More
+1. **Clonar el repositorio**
+```bash
+git clone https://github.com/tu-usuario/xagendax.git
+cd xagendax
+```
 
-To learn more about Next.js, take a look at the following resources:
+2. **Instalar dependencias**
+```bash
+npm install
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Configurar variables de entorno**
+Crear archivo `.env.local` en la raíz:
+```env
+NEXT_PUBLIC_SUPABASE_URL=tu_url_de_supabase
+NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key_de_supabase
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. **Ejecutar en desarrollo**
+```bash
+npm run dev
+```
 
-## Deploy on Vercel
+Abrir [http://localhost:3000](http://localhost:3000)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🔐 Credenciales de Prueba
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Email**: dev@dbarreto.net
+- **Password**: password123
+
+## 📋 Funcionalidades Planificadas
+
+### Fase 1: Base (En progreso)
+- [x] Setup inicial y autenticación
+- [x] Layout compartido
+- [ ] CRUD de clientes
+- [ ] Tablas en Supabase
+
+### Fase 2: Calendario
+- [ ] Sistema de agendamiento
+- [ ] Vista de calendario
+- [ ] Gestión de citas
+
+### Fase 3: Pagos y Finanzas
+- [ ] Registro de pagos (efectivo, transferencia)
+- [ ] Cálculo de comisiones
+- [ ] Reportes financieros
+
+### Fase 4: Comunicación
+- [ ] Integración con WhatsApp (enlaces directos)
+- [ ] Recordatorios por email
+- [ ] Encuestas de satisfacción
+
+### Fase 5: Analytics
+- [ ] Dashboard avanzado
+- [ ] Exportación de reportes (PDF/Excel)
+- [ ] Métricas de negocio
+
+### Fase 6: Multi-tenant
+- [ ] Subdominios por cliente
+- [ ] Gestión de múltiples negocios
+
+## 🤝 Contribuir
+
+Este es un proyecto en desarrollo activo. Si encuentras bugs o tienes sugerencias:
+
+1. Abre un issue describiendo el problema/sugerencia
+2. Haz fork del proyecto
+3. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+4. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+5. Push a la rama (`git push origin feature/AmazingFeature`)
+6. Abre un Pull Request
+
+## 📝 Notas de Desarrollo
+
+- **Principiante-friendly**: Código comentado y estructurado para aprendizaje
+- **Mobile-first**: Diseño responsive desde el inicio
+- **TypeScript estricto**: Para mejor mantenibilidad
+- **Componentes reutilizables**: Arquitectura modular
+
+## 🐛 Problemas Conocidos
+
+- El título del header está hardcodeado como "Dashboard" (pendiente hacerlo dinámico)
+
+## 📄 Licencia
+
+Este proyecto está bajo desarrollo privado. Todos los derechos reservados.
+
+---
+
+**Desarrollado con 💙 mientras aprendo React/TypeScript**
