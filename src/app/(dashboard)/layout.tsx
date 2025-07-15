@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { User } from '@supabase/supabase-js'
 import { Calendar, Users, DollarSign, Clock, Menu, X, LogOut } from 'lucide-react'
+import { Button } from "@/components/ui"
 
 export default function DashboardLayout({
     children,
@@ -69,12 +70,12 @@ export default function DashboardLayout({
                         </div>
                         <span className="font-semibold text-gray-900">XAgendaX</span>
                     </div>
-                    <button
+                    <Button
                         onClick={() => setSidebarOpen(false)}
-                        className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
+                        className="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-500"
                     >
-                        <X className="w-5 h-5 text-gray-500" />
-                    </button>
+                        <X className="w-5 h-5" />
+                    </Button>
                 </div>
 
                 {/* Menu de navegacion */}

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import { Mail, Lock, Calendar, AlertCircle } from 'lucide-react'
+import Button from '@/components/ui/Button'
 
 export default function LoginPage() {
     const [email, setEmail] = useState('')
@@ -97,25 +98,16 @@ export default function LoginPage() {
                             </div>
                         </div>
                         {/* Boton de submit */}
-                        <button
+                        <Button
+                            variant="primary"
                             type="submit"
+                            size="md"
+                            fullWidth
+                            loading={loading}
                             disabled={loading}
-                            className="w-full flex items-center justify-center px-4 py-2.5 border border-transparent rounded-lg text-white font-medium
-                                    bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-                                    disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
                         >
-                            {loading ? (
-                                <>
-                                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                                    </svg>
-                                    Iniciando sesión...
-                                </>
-                            ) : (
-                                'Iniciar sesión'
-                            )}
-                        </button>
+                            Iniciar sesión
+                        </Button>
                     </form>
                 </div>
             </div >
