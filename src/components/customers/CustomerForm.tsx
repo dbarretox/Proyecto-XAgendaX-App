@@ -3,6 +3,7 @@ import { Mail, Phone, User, StickyNote, AlertCircle, X } from 'lucide-react'
 import Button from '@/components/ui/Button'
 
 interface CustomerFormProps {
+    businessId: string
     onSubmit: (data: {
         name: string
         email?: string
@@ -21,6 +22,7 @@ interface CustomerFormProps {
 }
 
 export default function CustomerForm({
+    businessId,
     onSubmit,
     onClose,
     loading = false,

@@ -5,8 +5,9 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { User } from '@supabase/supabase-js'
-import { Calendar, Users, DollarSign, Clock, Menu, X, LogOut } from 'lucide-react'
+import { Calendar, Users, DollarSign, Clock, Menu, X, LogOut, Briefcase } from 'lucide-react'
 import { Button } from "@/components/ui"
+
 
 export default function DashboardLayout({
     children,
@@ -101,6 +102,18 @@ export default function DashboardLayout({
                     >
                         <Users className={`w-5 h-5 ${pathname === '/clientes' ? '' : 'text-gray-400'}`} />
                         <span>Clientes</span>
+                    </Link>
+
+                    <Link
+                        href="/servicios" 
+                        className={`flex items-center space-x-3 px-4 py-3 rounded-lg ${
+                            pathname === '/servicios'
+                            ? 'text-blue-600 bg-blue-50'
+                            : 'text-gray-700 hover:bg-gray-100'
+                        }`}
+                    >
+                        <Briefcase className={`w-5 h-5 ${pathname === '/servicios' ? '' : 'text-gray-400'}`} />
+                        <span>Servicios</span>
                     </Link>
 
                     <Link

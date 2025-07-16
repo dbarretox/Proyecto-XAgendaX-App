@@ -6,6 +6,7 @@ import type { Customer } from '@/types/database'
 import { Plus, Trash2, Pencil } from 'lucide-react'
 import CustomerForm from '@/components/customers/CustomerForm'
 import { getCurrentUserBusinessId } from '@/lib/business'
+import Button from '@/components/ui/Button'
 
 export default function ClientesPage() {
     const [customers, setCustomers] = useState<Customer[]>([])
@@ -19,14 +20,29 @@ export default function ClientesPage() {
     const [search, setSearch] = useState('')
     const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null)
 
-    //Cargar BusinessId
+    const loadCustomers = async () => {
+        if (!businessId) return
+
+        setLoading(true)
+        setError(null)
+        try {
+            const data = await getCustomers(businessId)
+            setCustomers(data)
+        } catch (err: any) {
+            setError(err.message)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    // Cargar BusinessId
     useEffect(() => {
         async function fetchBusinessId() {
             try {
                 const userBusinessId = await getCurrentUserBusinessId()
                 setBusinessId(userBusinessId)
             } catch (err: any) {
-                setError(err.message)
+                console.error('Error loading business:', err.message)
             }
         }
         fetchBusinessId()
@@ -35,36 +51,20 @@ export default function ClientesPage() {
     // Cargar clientes
     useEffect(() => {
         if (!businessId) return
-        
-        async function fetchCustomers() {
-            setLoading(true)
-            try {
-                const data = await getCustomers(businessId!)
-                setCustomers(data)
-            } catch (err: any) {
-                setError(err.message)
-            } finally {
-                setLoading(false)
-            }
-        }
-        fetchCustomers()
+        loadCustomers()
     }, [businessId])
 
     // Manejar creación de cliente
     const handleAddCustomer = async (formData: { name: string; email?: string; phone?: string; notes?: string }) => {
-        if (!businessId) return
-        
         setFormLoading(true)
         setFormError(null)
         try {
             await createCustomer({
                 ...formData,
-                business_id: businessId,
+                business_id: businessId!  // businessId ya está validado arriba
             })
             setShowForm(false)
-            // Refrescar lista
-            const data = await getCustomers(businessId)
-            setCustomers(data)
+            await loadCustomers()
         } catch (err: any) {
             setFormError(err.message)
         } finally {
@@ -72,16 +72,15 @@ export default function ClientesPage() {
         }
     }
 
+
     // Eliminar cliente
     const handleDeleteCustomer = async (id: string) => {
-        if (!businessId) return
-        
         if (!window.confirm('¿Seguro que deseas eliminar este cliente?')) return
+
         setDeleting(id)
         try {
             await deleteCustomer(id)
-            const data = await getCustomers(businessId)
-            setCustomers(data)
+            await loadCustomers() // Usar loadCustomers en lugar de código duplicado
         } catch (err: any) {
             alert('Error al eliminar: ' + err.message)
         } finally {
@@ -97,30 +96,34 @@ export default function ClientesPage() {
     )
 
     return (
-        <div className="space-y-6">
+        <div className="p-6">
             {/* Header con titulo y boton */}
-            <div className="flex items-center justify-between">
+            <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-semibold text-gray-900">Clientes</h1>
-                <button
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700"
-                    onClick={() => setShowForm(true)}
-                >
+                {/* Barra de busqueda de lista */}
+                <div className="space-x-5 flex justify-end">
 
-                    <Plus className="w-4 h-4" />
-                    <span>Agregar Cliente</span>
-                </button>
+                    <input
+                        type="text"
+                        className="w-full md:w-1/3 px-3 py-2 text-gray-900 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        placeholder="Buscar cliente por nombre, correo o teléfono"
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                    />
+                    <Button
+                        variant="primary"
+                        size="md"
+                        onClick={() => setShowForm(true)}
+                    >
+
+                        <Plus className="w-4 h-4" />
+                        Agregar Cliente
+                    </Button>
+                </div>
             </div>
 
-            {/* Barra de busqueda de lista */}
-            <div>
-                <input
-                    type="text"
-                    className="w-full md:w-1/3 px-3 py-2 border rounded-lg mb-4 focus:ring-2 focus:ring-blue-500"
-                    placeholder="Buscar cliente por nombre, correo o teléfono"
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                />
-            </div>
+
+
 
 
             {/* Cargando / error / lista */}
@@ -176,6 +179,7 @@ export default function ClientesPage() {
             {/* Modal formulario */}
             {showForm && (
                 <CustomerForm
+                    businessId={businessId!}
                     onSubmit={handleAddCustomer}
                     onClose={() => setShowForm(false)}
                     loading={formLoading}
@@ -185,16 +189,14 @@ export default function ClientesPage() {
 
             {editingCustomer && (
                 <CustomerForm
+                    businessId={businessId!}
                     onSubmit={async (formData) => {
-                        if (!businessId) return
-                        
                         setFormLoading(true)
                         setFormError(null)
                         try {
                             await updateCustomer(editingCustomer.id, formData)
                             setEditingCustomer(null)
-                            const data = await getCustomers(businessId!)
-                            setCustomers(data)
+                            await loadCustomers() // Usar loadCustomers en lugar de código duplicado
                         } catch (err: any) {
                             setFormError(err.message)
                         } finally {
