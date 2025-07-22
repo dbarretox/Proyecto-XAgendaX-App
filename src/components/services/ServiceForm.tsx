@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Service, ServiceInsert, ServiceUpdate } from '@/types'
 import { createService, updateService } from '@/lib/services'
 import { X } from 'lucide-react'
@@ -13,12 +13,18 @@ interface ServiceFormProps {
     onCancel: () => void
 }
 
-export function ServiceForm({ service, businessId, onSuccess, onCancel }: ServiceFormProps) {
+export function ServiceForm({ 
+    service, 
+    businessId, 
+    onSuccess, 
+    onCancel 
+}: ServiceFormProps) {
     const [loading, setLoading] = useState(false)
     const [formData, setFormData] = useState({
         name: service?.name || '',
         description: service?.description || '',
         duration: service?.duration || 60,
+        currency: (service?.currency || 'USD') as 'USD' | 'COP' | 'PAB',
         price: service?.price || 0,
         category: service?.category || '',
         active: service?.active ?? true

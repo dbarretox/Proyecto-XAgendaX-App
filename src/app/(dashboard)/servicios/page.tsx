@@ -5,8 +5,8 @@ import { Service } from '@/types'
 import { getServices, deleteService } from '@/lib/services'
 import { getCurrentUserBusinessId } from '@/lib/business'
 import { ServiceForm } from '@/components/services/ServiceForm'
-import Button from '@/components/ui/Button'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
+import Button from '@/components/ui/CustomButton'
+import { Plus, Pencil, Trash2, Loader2Icon } from 'lucide-react'
 
 export default function ServicesPage() {
     const [businessId, setBusinessId] = useState<string | null>(null)
@@ -17,7 +17,7 @@ export default function ServicesPage() {
 
     const loadServices = async () => {
         if (!businessId) return
-        
+
         setLoading(true)
         try {
             const data = await getServices(businessId)
@@ -48,26 +48,25 @@ export default function ServicesPage() {
         loadServices()
     }, [businessId])
 
-    const handleDelete = async (id: string) => {
-        if (!confirm('¿Estás seguro de eliminar este servicio?')) return
-
-        const success = await deleteService(id)
-        if (success) {
-            loadServices()
-        } else {
-            alert('Error al eliminar el servicio')
-        }
+    // Manejo de Handles
+    const handleCreate = () => {
+        setSelectedService(null)
+        setShowForm(true)
     }
-
 
     const handleEdit = (service: Service) => {
         setSelectedService(service)
         setShowForm(true)
     }
 
-    const handleCreate = () => {
-        setSelectedService(null)
-        setShowForm(true)
+    const handleDelete = async (id: string) => {
+        if (!confirm('¿Estás seguro de eliminar este servicio?')) return
+        try {
+            await deleteService(id)
+            await loadServices()
+        } catch (error) {
+            alert('Error al eliminar el servicio')
+        }
     }
 
     const handleFormSuccess = () => {
@@ -77,18 +76,11 @@ export default function ServicesPage() {
     }
 
 
-    if (!businessId) {
+    if (!businessId || loading) {
         return (
-            <div className="flex items-center justify-center h-64">
-                <p className="text-gray-500">Cargando servicios...</p>
-            </div>
-        )
-    }
-
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center h-64">
-                <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full" />
+            <div className="flex items-center justify-center h-64 gap-2 space-x-1">
+                <Loader2Icon className="animate-spin text-blue-600" />
+                <p className="text-gray-500">Cargando servicios</p>
             </div>
         )
     }
@@ -105,27 +97,17 @@ export default function ServicesPage() {
                     <Plus className="h-4 w-4" />
                     Nuevo Servicio
                 </Button>
-            </div>    
+            </div>
 
             <div className="bg-white shadow-sm rounded-lg overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Servicio
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Duración
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Precio
-                            </th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Estado
-                            </th>
-                            <th className="relative px-6 py-3">
-                                <span className="sr-only">Acciones</span>
-                            </th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Servicio</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duración</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                            <th className="relative px-6 py-3"><span className="sr-only">Acciones</span></th>
                         </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -141,23 +123,16 @@ export default function ServicesPage() {
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div>
                                             <div className="text-sm font-medium text-gray-900">{service.name}</div>
-                                            {service.category && (
-                                                <div className="text-sm text-gray-500">{service.category}</div>
-                                            )}
+                                            {service.category && (<div className="text-sm text-gray-500">{service.category}</div>)}
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {service.duration} min
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        ${service.price.toFixed(2)}
-                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{service.duration} min</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${service.price.toFixed(2)}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                            service.active 
-                                                ? 'bg-green-100 text-green-800' 
+                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${service.active
+                                                ? 'bg-green-100 text-green-800'
                                                 : 'bg-gray-100 text-gray-800'
-                                        }`}>
+                                            }`}>
                                             {service.active ? 'Activo' : 'Inactivo'}
                                         </span>
                                     </td>
@@ -187,8 +162,8 @@ export default function ServicesPage() {
             </div>
             {showForm && (
                 <ServiceForm
-                    service={selectedService}
                     businessId={businessId}
+                    service={selectedService}
                     onSuccess={handleFormSuccess}
                     onCancel={() => {
                         setShowForm(false)

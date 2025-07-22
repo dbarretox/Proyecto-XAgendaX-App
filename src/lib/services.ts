@@ -1,20 +1,5 @@
 import { supabase } from './supabase'
-import { Service, ServiceInsert, ServiceUpdate } from '@/types/database'
-
-// Crear servicio
-export async function createService(service: ServiceInsert): Promise<Service | null> {
-    const { data, error } = await supabase
-        .from('services')
-        .insert(service)
-        .select()
-        .single()
-
-    if (error) {
-        console.error('Error creating service:', error)
-        return null
-    }
-    return data
-}
+import { Service, ServiceInsert, ServiceUpdate } from '@/types'
 
 // Obtener todos los servicios del negocio
 export async function getServices(businessId: string): Promise<Service[]> {
@@ -22,7 +7,7 @@ export async function getServices(businessId: string): Promise<Service[]> {
         .from('services')
         .select('*')
         .eq('business_id', businessId)
-        .order('name', { ascending: true })
+        .order('created_at', { ascending: false })
     
     if (error) {
         console.error('Error fetching services:', error)
@@ -41,6 +26,21 @@ export async function getServiceById(id: string): Promise<Service | null> {
 
     if (error) {
         console.error('Error fetching service:', error)
+        return null
+    }
+    return data
+}
+
+// Crear servicio
+export async function createService(service: ServiceInsert): Promise<Service | null> {
+    const { data, error } = await supabase
+        .from('services')
+        .insert(service)
+        .select()
+        .single()
+
+    if (error) {
+        console.error('Error creating service:', error)
         return null
     }
     return data

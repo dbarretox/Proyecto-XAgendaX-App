@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import { Mail, Lock, Calendar, AlertCircle } from 'lucide-react'
-import Button from '@/components/ui/Button'
+import { Button} from '@/components/ui/button'
+import Buttons from '@/components/ui/CustomButton'
 
 export default function LoginPage() {
     const [email, setEmail] = useState('')
@@ -38,7 +39,7 @@ export default function LoginPage() {
             <div className="w-full max-w-md">
                 {/* Logo y titulo */}
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl mb-4">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-2xl mb-4">
                         <Calendar className="w-8 h-8 text-white" />
                     </div>
                     <h1 className="text-2xl font-semibold text-gray-900">XAgendaX</h1>
@@ -99,6 +100,13 @@ export default function LoginPage() {
                         </div>
                         {/* Boton de submit */}
                         <Button
+                            type="submit"
+                            size="lg"
+                            className="w-full"
+                        >
+                            Iniciar sesión
+                        </Button>
+                        {/*<Buttons
                             variant="primary"
                             type="submit"
                             size="md"
@@ -107,7 +115,7 @@ export default function LoginPage() {
                             disabled={loading}
                         >
                             Iniciar sesión
-                        </Button>
+                        </Buttons> */}
                     </form>
                 </div>
             </div >

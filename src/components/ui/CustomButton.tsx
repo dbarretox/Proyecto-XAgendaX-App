@@ -1,7 +1,7 @@
 import type { ButtonProps } from "@/types"
 import { forwardRef } from 'react'
 
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
+const Buttons = forwardRef<HTMLButtonElement, ButtonProps>(({
     children,
     onClick,
     className = "",
@@ -66,6 +66,6 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
     )
 })
 
-Button.displayName = 'Button'
+Buttons.displayName = 'Button'
 
-export default Button
+export default Buttons

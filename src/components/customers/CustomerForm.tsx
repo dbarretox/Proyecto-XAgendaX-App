@@ -1,196 +1,157 @@
-import { useState, useEffect } from 'react'
-import { Mail, Phone, User, StickyNote, AlertCircle, X } from 'lucide-react'
-import Button from '@/components/ui/Button'
+'use client'
+
+import { useState } from 'react'
+import { Customer, CustomerInsert, CustomerUpdate } from '@/types'
+import { createCustomer, updateCustomer } from '@/lib/customers'
+import { X } from 'lucide-react'
+import { Button } from '@/components/ui'
 
 interface CustomerFormProps {
+    customer?: Customer | null
     businessId: string
-    onSubmit: (data: {
-        name: string
-        email?: string
-        phone?: string
-        notes?: string
-    }) => void
-    onClose: () => void
-    loading?: boolean
-    error?: string | null
-    initialValues?: {
-        name: string
-        email?: string
-        phone?: string
-        notes?: string
-    }
+    onSuccess: () => void
+    onCancel: () => void
 }
 
-export default function CustomerForm({
+export function CustomerForm({
+    customer,
     businessId,
-    onSubmit,
-    onClose,
-    loading = false,
-    error = null,
-    initialValues
+    onSuccess,
+    onCancel
 }: CustomerFormProps) {
-    const [name, setName] = useState(initialValues?.name || '')
-    const [email, setEmail] = useState(initialValues?.email || '')
-    const [phone, setPhone] = useState(initialValues?.phone || '')
-    const [notes, setNotes] = useState(initialValues?.notes || '')
+    const [loading, setLoading] = useState(false)
+    const [formData, setFormData] = useState({
+        name: customer?.name || '',
+        email: customer?.email || '',
+        phone: customer?.phone || '',
+        notes: customer?.notes || '',
+    })
 
-    const hasUnsavedChanges =
-        name !== (initialValues?.name || '') ||
-        email !== (initialValues?.email || '') ||
-        phone !== (initialValues?.phone || '') ||
-        notes !== (initialValues?.notes || '')
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setLoading(true)
 
-    const handleClose = () => {
-        if (hasUnsavedChanges) {
-            if(!window.confirm('Tienes cambios sin guardar, ¿seguro que quieres salir?')) return
+        try {
+            if (customer) {
+                // Modo edición
+                const updates: CustomerUpdate = formData
+                await updateCustomer(customer.id, updates)
+            } else {
+                // Modo creación
+                const newCustomer: CustomerInsert = {
+                    ...formData,
+                    business_id: businessId
+                }
+                await createCustomer(newCustomer)
+            }
+
+            onSuccess()
+        } catch (error) {
+            console.error('Error saving customer:', error)
+            alert('Error al guardar el cliente')
+        } finally {
+            setLoading(false)
         }
-        onClose()
     }
 
-    useEffect(() => {
-        setName(initialValues?.name || '')
-        setEmail(initialValues?.email || '')
-        setPhone(initialValues?.phone || '')
-        setNotes(initialValues?.notes || '')
-    }, [initialValues])
-
-    // Cerrar con ESC
-    useEffect(() => {
-        const handleEsc = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') onClose()
-        }
-        window.addEventListener('keydown', handleEsc)
-        return () => window.removeEventListener('keydown', handleEsc)
-    }, [onClose])
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    ) => {
+        const { name, value, type } = e.target
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }))
+    }
 
     return (
-        <div
-            className="fixed inset-0 z-50 bg-gray-800/70 flex items-center justify-center"
-            onClick={handleClose}
-        >
-            <div
-                className="w-full max-w-md"
-                onClick={e => e.stopPropagation()}
-            >
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sm:p-8 mx-4 sm:mx-0">
-                    <form
-                        onSubmit={e => {
-                            e.preventDefault()
-                            onSubmit({ name, email, phone, notes })
-                        }}
-                        className="space-y-6"
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-semibold">
+                        {customer ? 'Editar Cliente' : 'Nuevo Cliente'}
+                    </h2>
+                    <button
+                        onClick={onCancel}
+                        className="text-gray-500 hover:text-gray-700"
                     >
-                        {/* Mensaje de error */}
-                        {error && (
-                            <div className="flex items-start space-x-3 text-red-600 bg-red-50 p-4 rounded-lg">
-                                <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                                <p className="text-sm">{error}</p>
-                            </div>
-                        )}
-                        <div className="flex justify-between items-center">
-                        <h2 className="text-lg font-semibold text-gray-900 mb-2">{initialValues ? 'Editar Cliente' : 'Agregar Cliente'}</h2>
-                        <Button
-                                variant="closeX"
-                                type="button"
-                                onClick={onClose}
-                                disabled={loading}
-                                className=""
-                            >
-                                <X className="w-5 h-5" />
-                            </Button>
-                            </div>
-                        {/* Nombre */}{/* Nombre */}
-                        <div>
-                            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                                Nombre *
-                            </label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <User className="h-5 w-5 text-gray-400" />
-                                </div>
-                                <input
-                                    id="name"
-                                    value={name}
-                                    onChange={e => setName(e.target.value)}
-                                    required
-                                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500
-                            focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                                    placeholder="Nombre del cliente"
-                                />
-                            </div>
-                        </div>
-                        {/* Email */}
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                                Email
-                            </label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Mail className="h-5 w-5 text-gray-400" />
-                                </div>
-                                <input
-                                    id="email"
-                                    type="email"
-                                    value={email}
-                                    onChange={e => setEmail(e.target.value)}
-                                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500
-                            focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                                    placeholder="correo@cliente.com"
-                                />
-                            </div>
-                        </div>
-                        {/* Teléfono */}
-                        <div>
-                            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                                Teléfono
-                            </label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Phone className="h-5 w-5 text-gray-400" />
-                                </div>
-                                <input
-                                    id="phone"
-                                    value={phone}
-                                    onChange={e => setPhone(e.target.value)}
-                                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500
-                            focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                                    placeholder="Ej: 6611-2233"
-                                />
-                            </div>
-                        </div>
-                        {/* Notas */}
-                        <div>
-                            <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
-                                Notas
-                            </label>
-                            <div className="relative">
-                                <div className="absolute top-2 left-0 pl-3 flex items-center pointer-events-none">
-                                    <StickyNote className="h-5 w-5 text-gray-400" />
-                                </div>
-                                <textarea
-                                    id="notes"
-                                    value={notes}
-                                    onChange={e => setNotes(e.target.value)}
-                                    className="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500
-                            focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                                    placeholder="Notas adicionales"
-                                    rows={2}
-                                />
-                            </div>
-                        </div>
-                        {/* Acciones */}
-                        <div className="grid gap-2 mt-4">
-                            <Button
-                                variant="primary"
-                                type="submit"
-                                disabled={loading}
-                                className="w-full"
-                            >
-                                {loading ? 'Guardando...' : 'Guardar'}
-                            </Button>
-                        </div>
-                    </form>
+                        <X className="h-5 w-5" />
+                    </button>
                 </div>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Nombre del cliente
+                        </label>
+                        <input
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Ej: Juan Pérez"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Email
+                        </label>
+                        <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="correo@ejemplo.com"
+                        />
+                    </div>
+<div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Teléfono
+                        </label>
+                        <input
+                            type="tel"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Ej: 6611-2233"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Notas
+                        </label>
+                        <textarea
+                            name="notes"
+                            value={formData.notes}
+                            onChange={handleChange}
+                            rows={3}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Notas adicionales sobre el cliente..."
+                        />
+                    </div>
+                    <div className="flex gap-3 pt-4">
+                        <Button
+                            type="submit"
+                            variant="primary"
+                            fullWidth
+                            loading={loading}
+                        >
+                            {customer ? 'Guardar cambios' : 'Crear cliente'}
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="light"
+                            fullWidth
+                            onClick={onCancel}
+                            disabled={loading}
+                        >
+                            Cancelar
+                        </Button>
+                    </div>
+                </form>
             </div>
         </div>
     )
